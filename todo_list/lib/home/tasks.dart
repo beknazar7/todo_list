@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_list_04flu/add/add_page.dart';
+import 'package:todo_list_04flu/settings/settings_page.dart';
 
 class Task {
   String title;
@@ -18,6 +19,7 @@ class TaskListScreen extends StatefulWidget {
 
 class _TaskListScreenState extends State<TaskListScreen> {
   final List<Task> tasks = [];
+  bool _isDarkMode = false; // храним здесь
 
   void _toggleTask(int index) {
     setState(() {
@@ -28,7 +30,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
   Future<void> _navigateToAddPage() async {
     final result = await Navigator.push<String>(
       context,
-      MaterialPageRoute(builder: (_) => const AddPage()),
+      MaterialPageRoute(builder: (_) => AddPage(isDarkMode: _isDarkMode)),
     );
 
     if (result != null && result.isNotEmpty) {
@@ -42,22 +44,47 @@ class _TaskListScreenState extends State<TaskListScreen> {
     }
   }
 
+  Future<void> _navigateToSettings() async {
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SettingsPage(isDarkMode: _isDarkMode), // передаём текущее значение
+      ),
+    );
+
+    if (result != null) {
+      setState(() {
+        _isDarkMode = result; // получаем обратно и перерисовываем
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final backgroundColor = _isDarkMode ? const Color(0xFF1C1C1E) : const Color(0xFFF2F2F7);
+    final appBarColor = _isDarkMode ? const Color(0xFF1C1C1E) : Colors.white;
+    final textColor = _isDarkMode ? Colors.white : Colors.black;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F2F7),
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: appBarColor,
         elevation: 0,
-        title: const Text(
+        title: Text(
           'Мои задачи',
           style: TextStyle(
-            color: Colors.black,
+            color: textColor,
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.settings, color: textColor),
+            onPressed: _navigateToSettings,
+          ),
+        ],
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(1),
           child: Divider(height: 1, color: Color(0xFFE0E0E0)),
@@ -67,10 +94,10 @@ class _TaskListScreenState extends State<TaskListScreen> {
         children: [
           Expanded(
             child: tasks.isEmpty
-                ? const Center(
+                ? Center(
                     child: Text(
                       'Нет задач',
-                      style: TextStyle(color: Colors.grey, fontSize: 16),
+                      style: TextStyle(color: _isDarkMode ? Colors.grey[400] : Colors.grey, fontSize: 16),
                     ),
                   )
                 : ListView.builder(

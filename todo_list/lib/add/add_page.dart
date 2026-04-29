@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class AddPage extends StatefulWidget {
-  const AddPage({super.key});
+  final bool isDarkMode;
+
+  const AddPage({super.key, required this.isDarkMode});
 
   @override
   State<AddPage> createState() => _AddPageState();
@@ -25,19 +27,25 @@ class _AddPageState extends State<AddPage> {
 
   @override
   Widget build(BuildContext context) {
+    final backgroundColor = widget.isDarkMode ? const Color(0xFF1C1C1E) : const Color(0xFFF2F2F7);
+    final appBarColor = widget.isDarkMode ? const Color(0xFF1C1C1E) : Colors.white;
+    final textColor = widget.isDarkMode ? Colors.white : Colors.black;
+    final fieldColor = widget.isDarkMode ? const Color(0xFF2C2C2E) : Colors.white;
+    final hintColor = widget.isDarkMode ? Colors.grey[500] : Colors.grey;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F2F7),
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: appBarColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left, color: Colors.black, size: 32),
+          icon: Icon(Icons.chevron_left, color: textColor, size: 32),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Новая задача',
           style: TextStyle(
-            color: Colors.black,
+            color: textColor,
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -55,11 +63,12 @@ class _AddPageState extends State<AddPage> {
             const SizedBox(height: 8),
             TextField(
               controller: _controller,
+              style: TextStyle(color: textColor),
               decoration: InputDecoration(
                 hintText: 'введите название задачи',
-                hintStyle: const TextStyle(color: Colors.grey),
+                hintStyle: TextStyle(color: hintColor),
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: fieldColor,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: const BorderSide(color: Color(0xFFD0D0D0)),
