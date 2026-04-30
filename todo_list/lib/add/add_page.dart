@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'add_view_model.dart';
+import 'add_state.dart';
 
 class AddPage extends StatefulWidget {
   final bool isDarkMode;
@@ -11,6 +13,15 @@ class AddPage extends StatefulWidget {
 
 class _AddPageState extends State<AddPage> {
   final TextEditingController _controller = TextEditingController();
+  final AddViewModel _viewModel = AddViewModel();
+
+  @override
+  void initState() {
+    super.initState();
+    _viewModel.addListener(() {
+      setState(() {}); // перерисовываем экран когда состояние меняется
+    });
+  }
 
   @override
   void dispose() {
@@ -20,13 +31,18 @@ class _AddPageState extends State<AddPage> {
 
   void _save() {
     final text = _controller.text.trim();
-    if (text.isNotEmpty) {
+    _viewModel.addTask(text);
+
+    // если текст не пустой — возвращаем на главный экран
+    if (_viewModel.state.isSucceed) {
       Navigator.pop(context, text);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final AddState state = _viewModel.state;
+
     final backgroundColor = widget.isDarkMode ? const Color(0xFF1C1C1E) : const Color(0xFFF2F2F7);
     final appBarColor = widget.isDarkMode ? const Color(0xFF1C1C1E) : Colors.white;
     final textColor = widget.isDarkMode ? Colors.white : Colors.black;
@@ -87,6 +103,32 @@ class _AddPageState extends State<AddPage> {
                 ),
               ),
             ),
+
+            // показываем текст под полем в зависимости от состояния
+            if (!state.isInitial && !state.isSucceed)
+              const Padding(
+                padding: EdgeInsets.only(top: 8),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'введите название задачи',
+                    style: TextStyle(color: Colors.red, fontSize: 13),
+                  ),
+                ),
+              ),
+
+            if (!state.isInitial && state.isSucceed)
+              const Padding(
+                padding: EdgeInsets.only(top: 8),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'сохранено!',
+                    style: TextStyle(color: Colors.green, fontSize: 13),
+                  ),
+                ),
+              ),
+
             const Spacer(),
             SizedBox(
               width: double.infinity,
